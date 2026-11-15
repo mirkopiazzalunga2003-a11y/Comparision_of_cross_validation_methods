@@ -1,3 +1,4 @@
+
 # CHECK AND INSTALL LIBRARIES
 
 import importlib.util
@@ -50,66 +51,66 @@ from src.functions.cross_val_function import cross_validation_function
 # ENERGY CONSUMPTION
 from codecarbon import EmissionsTracker
 
-import os        # gestione variabili d'ambiente
-import pathlib   # gestire percorsi file 
+import os        # manage environment variables
+import pathlib   # manage file paths
 
 powershell_path = (
-    pathlib.Path(                                       # recupero directory principale di windoes 
-        os.environ.get("SystemRoot", r"C:\Windows"))    # costruisce percorso di powershell 
+    pathlib.Path(                                       # retrieve the main Windows directory
+        os.environ.get("SystemRoot", r"C:\Windows"))    # construct the PowerShell path
     / "System32"
     / "WindowsPowerShell"
     / "v1.0"
     / "powershell.exe"
 )
 
-os.environ["PATH"] = (               # aggiungo cartella di powershell alla variabile PATH
+os.environ["PATH"] = (               # add the PowerShell directory to the PATH variable
     str(powershell_path.parent)
     + os.pathsep
     + os.environ.get("PATH", "")
 )
 
-print("PowerShell trovato:", powershell_path.exists())
+print("PowerShell found:", powershell_path.exists())
 
-# per code carbon voglio solo messaggi CRITICAL 
-# altrimenti vengono dati in input messaggi INFO ogni secondo
+# for CodeCarbon, display only CRITICAL messages
+# otherwise, INFO messages are printed every second
 import logging
 logging.getLogger("codecarbon").setLevel(logging.CRITICAL)
 
 print("All libraries successfully imported")
 
-# due appunti su codecarbon fucntion
+# some notes on the CodeCarbon function
 '''
 tracker = EmissionsTracker(
-    # nome del progetto
+    # project name
     project_name = "model_1",   
 
-    # ambito del monitoraggio 
-    # - "machine": considera consumo dell'intero sistama: CPU, RAM e GPU 
-    # - "process": energia attribuibile al processo Python, utile quando lavoro ha altre esecuzioni in parallelo 
+    # monitoring scope
+    # - "machine": considers the consumption of the entire system: CPU, RAM and GPU
+    # - "process": considers the energy attributable to the Python process, useful when other processes are running in parallel
     # https://docs.codecarbon.io/latest/explanation/methodology/#tracking-modes
     tracking_mode = "process",                    
 
-    # intrvallo di campionamento, ogni quanto viene stimato il consumo energetico, default 15
-    # abbassare valore porta a osservare meglio variazioni temporali ma non garantisce stima più precisa
-    # se troppo piccolo non potrebbe andare a interferire?
+    # sampling interval: how often energy consumption is estimated, default is 15
+    # lowering this value allows more frequent observation of temporal variations but does not guarantee a more accurate estimate
+    # if it is too small, could it interfere with the process?
     measure_power_secs = 1, 
 
-    # osservare solo info, warning o critical 
+    # display only info, warning or critical messages
     # "INFO", "WARNING", "CRITICAL"
     log_level= "CRITICAL"
     
-    # salvare risultati in un csv finale 
+    # save the final results to a CSV file
     # https://docs.codecarbon.io/latest/reference/output/
 )
 
 tracker.start()
-# MODELLO 
+# MODEL
 tracker.stop()
 
-# recupero valori utili
-# https://docs.codecarbon.io/3.3/reference/output/ 
+# retrieve useful values
+# https://docs.codecarbon.io/3.3/reference/output/
 data = tracker.final_emissions_data
-energy_wh = data.energy_consumed *1000    # default in kWh
-duration_s = data.duration                # default in secondi 
-emissions_g = data.emissions * 1000       # default in kg
+energy_wh = data.energy_consumed *1000    # default unit: kWh
+duration_s = data.duration                # default unit: seconds
+emissions_g = data.emissions * 1000       # default unit: kg
 '''
