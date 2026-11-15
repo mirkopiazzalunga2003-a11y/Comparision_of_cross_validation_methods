@@ -1,3 +1,7 @@
+import os
+os.chdir(r"C:\\Users\\mirko\\Desktop\\cross_validation")
+from src.functions.imports import * 
+
 def my_k_fold_cv(X, k:int, shuffle:bool = True, seed = 11): 
     # X as DataFrame
     # shuffle allows the indices to be randomly shuffled

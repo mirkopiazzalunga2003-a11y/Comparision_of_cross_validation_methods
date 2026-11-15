@@ -1,4 +1,3 @@
-
 # CHECK AND INSTALL LIBRARIES
 
 import importlib.util
@@ -9,7 +8,10 @@ libraries = {
     "pandas": "pandas",
     "numpy": "numpy",
     "sklearn": "scikit-learn",
-    "codecarbon": "codecarbon"
+    "codecarbon": "codecarbon",
+    "cpuinfo": "py-cpuinfo",
+    "matplotlib": "matplotlib",
+    "seaborn": "seaborn"
 }
 
 for library, package in libraries.items():
@@ -44,39 +46,47 @@ from sklearn.metrics import matthews_corrcoef
 
 from sklearn.ensemble import RandomForestClassifier
 
-# MY FUNCTIONS 
-from src.functions.metrics import my_metrics
-from src.functions.cross_val_function import cross_validation_function
+# CPU INFORMATION
+
+import cpuinfo
+
+print("CPU model:", cpuinfo.get_cpu_info().get("brand_raw"))
 
 # ENERGY CONSUMPTION
-from codecarbon import EmissionsTracker
 
-import os        # manage environment variables
-import pathlib   # manage file paths
+import os
+import pathlib
+
+# Add PowerShell to PATH
 
 powershell_path = (
-    pathlib.Path(                                       # retrieve the main Windows directory
-        os.environ.get("SystemRoot", r"C:\Windows"))    # construct the PowerShell path
+    pathlib.Path(os.environ.get("SystemRoot", r"C:\Windows"))
     / "System32"
     / "WindowsPowerShell"
     / "v1.0"
     / "powershell.exe"
 )
 
-os.environ["PATH"] = (               # add the PowerShell directory to the PATH variable
-    str(powershell_path.parent)
-    + os.pathsep
-    + os.environ.get("PATH", "")
-)
+if powershell_path.exists():
+    os.environ["PATH"] = (
+        str(powershell_path.parent)
+        + os.pathsep
+        + os.environ.get("PATH", "")
+    )
 
 print("PowerShell found:", powershell_path.exists())
 
-# for CodeCarbon, display only CRITICAL messages
-# otherwise, INFO messages are printed every second
+# CodeCarbon configuration
+from codecarbon import EmissionsTracker
+
 import logging
 logging.getLogger("codecarbon").setLevel(logging.CRITICAL)
 
 print("All libraries successfully imported")
+
+# MY FUNCTIONS 
+from src.functions.metrics import my_metrics
+from src.functions.cross_val_function import cross_validation_function
 
 # some notes on the CodeCarbon function
 '''

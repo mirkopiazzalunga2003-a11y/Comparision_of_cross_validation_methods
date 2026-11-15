@@ -1,10 +1,10 @@
 import os
 os.chdir(r"C:\\Users\\mirko\\Desktop\\cross-validation")
-from src.functions.imports import *
+from src.functions.imports import * 
 
 # !!! WORKING IN PROGRESS !!!
 
-df = pd.read_csv("data\\\Utrecht2019_dataset_plos_one_0222717_s001.csv")
+df = pd.read_csv("data\\Utrecht2019_dataset_plos_one_0222717_s001.csv")
 
 # dataset characteristics
 df.info()

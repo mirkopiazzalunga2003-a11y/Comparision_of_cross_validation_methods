@@ -1,4 +1,6 @@
-import numpy as np
+import os
+os.chdir(r"C:\\Users\\mirko\\Desktop\\cross_validation")
+from src.functions.imports import * 
 
 def my_metrics(y_true, y_pred, y_score): 
 

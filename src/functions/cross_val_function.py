@@ -1,3 +1,7 @@
+import os
+os.chdir(r"C:\\Users\\mirko\\Desktop\\cross_validation")
+from src.functions.imports import * 
+
 def cross_validation_function(
     y,                    # y as data frame
     X,                    # X as data frame
@@ -84,7 +88,8 @@ def cross_validation_function(
             tracking_mode="process",  # track the Python process rather than the entire machine
             measure_power_secs=1,     # collect measurements every second
             log_level= "CRITICAL",    # suppress info/warning messages
-            save_to_file=False
+            save_to_file=False,
+            allow_multiple_runs=True
         )
         tracker.start()
 
