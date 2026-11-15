@@ -1,14 +1,16 @@
 import os
-os.chdir(r"C:\\Users\\mirko\\Desktop\\cross-validation-research")
-from src.functions.imports import * 
+os.chdir(r"C:\\\Users\\\mirko\\\Desktop\\\cross-validation-research")
+from src.functions.imports import *
 
-df = pd.read_csv("data\\Utrecht2019_dataset_plos_one_0222717_s001.csv")
+# !!! WORKING IN PROGRESS !!!
 
-# caratteristiche dataset  
+df = pd.read_csv("data\\\Utrecht2019_dataset_plos_one_0222717_s001.csv")
+
+# dataset characteristics
 df.info()
-df.describe()      # vi sono alcuni valori NA 
+df.describe()      # there are some NA values
 
-# sistemo le classi 
+# fix the classes
 df.dtypes
 df["SVZ_contact"].unique()
 
@@ -18,33 +20,33 @@ df["KPS_greater_or_equal70"] = df["KPS_greater_or_equal70"].astype("category")
 df["SVZ_contact"] = df["KPS_greater_or_equal70"].astype("category")
 df["adjuvant_treatment"] = df["adjuvant_treatment"].astype("category")
 
-# correlazione tra variabili
+# correlation between variables
 df.corr()
 
-# valori mancanti
+# missing values
 df.isna().sum() / len(df)
-# come random forest gestisce nativamente valori NA in X 
-# nativamente va a testare se è meglio andare a classificare osservazioni con NA su ramo dx o ramo sx nel training, in base al criterio di impurità o informazione
-# non sta andando ad imputare valore, sta scegliendo quello che porta a classificazione migliore
-# considero eliminazione valori mancancti per analisi descrittive 
+# how Random Forest natively handles NA values in X
+# it natively tests whether it is better to classify observations with NA values into the right or left branch during training, based on the impurity or information criterion
+# it does not impute values; it selects the option that leads to better classification
+# I consider removing missing values for descriptive analyses
 df_nona = df.dropna()
-# verificare con dicotomizzazione valori na verificando se na dipendono da altre variabili
+# check through dichotomization whether missing values depend on other variables
 
-# verifico con stat descrittive relazione variabili 
-# x quantitativa - y binaria
+# examine relationships between variables using descriptive statistics
+# quantitative x - binary y
 y = df.iloc[:,-1]
 
 plt.figure()
 sns.boxplot(data = df, x = y, y = df.loc[:,"age"])
 plt.show()
 
-# tabella contingenza x binaria - y binaria 
+# contingency table: binary x - binary y
 pd.crosstab(
     y,
     df["KPS_greater_or_equal70"]
 )
 
-# distanza mahalanobis per verificati valori anomali NELLE VARIABILI QUANTITATIVE 
+# Mahalanobis distance to detect outliers IN THE QUANTITATIVE VARIABLES
 X = df_nona.loc[:,["age","survival_days"]].to_numpy()
 
 n = len(X)
@@ -52,29 +54,28 @@ one = np.ones((n,1))
 x_avg = np.array(X.T@one/n)
 
 X_tilde = X - one @ x_avg.T
-S = X_tilde.T @ X_tilde / n 
+S = X_tilde.T @ X_tilde / n
 
-mahal = np.sum((X_tilde @ np.linalg.inv(S)) * X_tilde, axis=1)
+mahal = np.sum((X_tilde @ np.linalg.inv(**S**)) * X_tilde, axis=1)
 
-# se osservazioni seguono distribuzione normale multivariata => mahal ~ chi^2 p 
+# if observations follow a multivariate normal distribution => mahal ~ chi^2 p
 p = X.shape[1]
 alpha = 0.01
 from scipy.stats import chi2
 threshold = chi2.ppf(1 - alpha, df=p)
 
 outliers = np.where(np.array(mahal) > threshold)[0]
-X_outliers = X[outliers, :]
+X_outliers =X[outliers, :]
 
 
-
-# feauture selection con variance impurity
+# feature selection using impurity variance
 model = RandomForestClassifier(
     n_estimators= 100 ,
     criterion = "gini",
     random_state = 11
 )
 
-# split dei dati 
+# data splitting
 X = df.iloc[:,:-1]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y,
@@ -90,7 +91,7 @@ importance = pd.Series(
     index=X.columns
 )
 
-# importanza relativa 
+# relative importance
 importance_relative = importance / importance.max()
 importance_relative = importance_relative.sort_values()
 

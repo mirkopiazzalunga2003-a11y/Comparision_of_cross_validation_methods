@@ -1,11 +1,11 @@
 def cross_validation_function(
     y,                    # y as data frame
     X,                    # X as data frame
-    cv_method = None,     # cross validation object
-    nested = False,       # definisco se voglio fare nested cv 
-    inner_cv = None,      # cross validation object per nested 
+    cv_method = None,     # cross-validation object
+    nested = False,       # define whether to perform nested CV
+    inner_cv = None,      # cross-validation object for nested CV
     outer_cv = None,   
-    param_grid = None,    # come input utilizzare sempre un dizionario di liste 
+    param_grid = None,    # always use a dictionary of lists as input
     seed = 11
     ):
 
@@ -17,81 +17,81 @@ def cross_validation_function(
             "min_samples_leaf": [1, 2]
         }
     
-    # verifico se input di param grid sono correttamente inizializzati
+    # check whether param_grid inputs are correctly initialized
     else: 
-        # verifico che param grid sia un dizionario
+        # check whether param_grid is a dictionary
         if not isinstance(param_grid, dict):
             raise TypeError("param_grid deve essere un dizionario.")
 
-        # verifico che param grid sia un dizionario di liste
+        # check whether param_grid is a dictionary of lists
         if not all(isinstance(v, list) for v in param_grid.values()):
             raise TypeError("Ogni valore di param_grid deve essere una lista.")
 
-        # verifico che le liste non siano vuote
+        # check that the lists are not empty
         if not param_grid or any(not v for v in param_grid.values()):
             raise ValueError("param_grid e le sue liste non possono essere vuote.")
 
-    # se nested è vero vado a far partire ciclo per ottimizzazione iperparametri
+    # if nested is True, start the loop for hyperparameter optimization
     if nested: 
     
-        # validi oggetti di cross validation 
+        # valid cross-validation objects
         valid_cv = (KFold, StratifiedKFold, ShuffleSplit, LeaveOneOut)
 
-        # verifica corretta inizializzazione inner e outer
+        # check that inner and outer are correctly initialized
         if inner_cv is None or outer_cv is None : 
 
-            # utilizzo ValueError se valore non è incompatibile con requisiti funzione
+            # use ValueError when a value is incompatible with the function requirements
             raise ValueError("Specificare inner_cv e outer_cv per la nested cross validation")
             
         if not isinstance(inner_cv, valid_cv):
             
-            # utilizzo TypeError se oggetto è del tipo sbagliato 
+            # use TypeError when the object has the wrong type
             raise TypeError(f"inner_cv deve essere uno tra {valid_cv}")
 
         if not isinstance(outer_cv, valid_cv):
             raise TypeError("outer_cv non è di un tipo valido.")
 
-        # considero possibilità di fare nested cv con diversi metodi di cross validation per outer    
+        # allow nested CV with different cross-validation methods for the outer loop
         if isinstance(outer_cv,(KFold,ShuffleSplit,LeaveOneOut)): 
 
-            # Definisco l'oggetto per lo split dei dati train-test 
+            # define the object for splitting the data into training and test sets
             split_data = outer_cv.split(X)
 
-        # possibile altra alternativa
+        # another possible alternative
         elif isinstance(outer_cv,StratifiedKFold): 
             split_data = outer_cv.split(X,y)
         
 
-        # definisco modello
+        # define the model
         model = RandomForestClassifier(random_state = seed)
 
-        # definisco grilgia di iperparametri per random forest 
+        # define the hyperparameter grid for Random Forest
         grid_search = GridSearchCV(
             estimator = model, 
             param_grid = param_grid, 
-            cv = inner_cv,                # oggetto che decide come verranno suddivisi i dati di training 
-            scoring = "matthews_corrcoef"  # in base a cosa scelgo modello migliore 
+            cv = inner_cv,                # object that determines how the training data will be split
+            scoring = "matthews_corrcoef"  # criterion used to select the best model
                                           # accuracy, roc_auc, mcc (matthews_corrcoef)
         )
 
-        # salvo risultati per calcolare metriche
+        # store results to calculate metrics
         y_true = []
         y_pred = []
         y_score = []
 
-        # inizializzo tracker di code carbon
+        # initialize CodeCarbon tracker
         tracker = EmissionsTracker(
-            tracking_mode="process",  # considero processo python e non della macchina 
-            measure_power_secs=1,     # considero misurazioni ogni secondo
-            log_level= "CRITICAL",    # evito che info/warning
+            tracking_mode="process",  # track the Python process rather than the entire machine
+            measure_power_secs=1,     # collect measurements every second
+            log_level= "CRITICAL",    # suppress info/warning messages
             save_to_file=False
         )
         tracker.start()
 
-        # ciclo per valori definiti dall oggetto method
+        # loop through the splits defined by the method object
         for train_index, val_index in split_data: 
 
-            # divido train e test con split oggetto method
+            # split training and test data using the method object
             X_train, y_train = X.iloc[train_index], y.iloc[train_index]
             X_test, y_test = X.iloc[val_index], y.iloc[val_index]
 
@@ -99,14 +99,14 @@ def cross_validation_function(
 
             best_model = grid_search.best_estimator_
 
-            # per osservare iperparametri migliori
+            # inspect the best hyperparameters
             # grid_search.best_params_
 
             y_true.append(y_test)
             y_pred.append(best_model.predict(X_test))
             y_score.append(best_model.predict_proba(X_test)[:,1])
         
-        # salvo i dati di code carbon
+        # save CodeCarbon data
         tracker.stop()
         data = tracker.final_emissions_data
 
@@ -116,12 +116,12 @@ def cross_validation_function(
             "duration_s": data.duration
         }
 
-        # concateno valori in un unico array
+        # concatenate values into a single array
         y_true = np.concatenate(y_true)
         y_pred = np.concatenate(y_pred)
         y_score = np.concatenate(y_score)
 
-        # calcolo metriche con la mia funzione 
+        # calculate metrics using my function
         metrics = my_metrics(y_true, y_pred, y_score)
 
         all_results = pd.concat([pd.Series(consumptions),pd.Series(metrics)])
@@ -129,16 +129,16 @@ def cross_validation_function(
         
         return df_results
     
-    # considero altre tipologie di cross validation
+    # consider other types of cross-validation
     else: 
 
-        # verifico se metodo è stato inizializzato
+        # check whether the method has been initialized
         if cv_method is None:
             raise ValueError(
                 "Specificare cv_method quando nested=False."
             )
 
-        # verifico se oggetto method è correttamente inizializzato 
+        # check whether the method object has been correctly initialized
         if isinstance(cv_method,(KFold,ShuffleSplit,LeaveOneOut)) :
             split_data = cv_method.split(X)
         elif  isinstance(cv_method,StratifiedKFold) : 
@@ -173,7 +173,7 @@ def cross_validation_function(
                 random_state = seed
             )
 
-            # fitto modello
+            # fit the model
             model.fit(X_train,y_train)
 
             y_true.append(y_test)
@@ -185,7 +185,7 @@ def cross_validation_function(
 
         consumptions = {
             "energy_wh": data.energy_consumed *1000 ,
-            "emissions_g_co2eq": data.emissions * 1000 ,
+            "emissions_g_co2eq": data.emissions *1000 ,
             "duration_s": data.duration
         }
 
