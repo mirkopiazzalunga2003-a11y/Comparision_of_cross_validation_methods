@@ -1,5 +1,5 @@
 import os
-os.chdir(r"C:\\\Users\\\mirko\\\Desktop\\\cross-validation")
+os.chdir(r"C:\\Users\\mirko\\Desktop\\cross-validation")
 from src.functions.imports import *
 
 # !!! WORKING IN PROGRESS !!!
