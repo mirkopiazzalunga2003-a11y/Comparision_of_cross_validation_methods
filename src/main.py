@@ -1,5 +1,5 @@
 import os
-os.chdir(r"C:\\Users\\mirko\\Desktop\\cross-validation-research")
+os.chdir(r"C:\\Users\\mirko\\Desktop\\cross-validation")
 from src.functions.imports import * 
 
 df = pd.read_csv("data\\Utrecht2019_dataset_plos_one_0222717_s001.csv", sep = "," )
