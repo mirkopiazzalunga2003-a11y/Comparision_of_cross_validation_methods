@@ -1,5 +1,5 @@
 import os
-os.chdir(r"C:\\Users\\mirko\\Desktop\\cross_validation")
+os.chdir(r"---\\cross_validation")
 from src.functions.imports import * 
 
 def cross_validation_function(
@@ -25,15 +25,15 @@ def cross_validation_function(
     else: 
         # check whether param_grid is a dictionary
         if not isinstance(param_grid, dict):
-            raise TypeError("param_grid deve essere un dizionario.")
+            raise TypeError("param_grid must be a dictorionary.")
 
         # check whether param_grid is a dictionary of lists
         if not all(isinstance(v, list) for v in param_grid.values()):
-            raise TypeError("Ogni valore di param_grid deve essere una lista.")
+            raise TypeError("Every value of param_grid must be a list")
 
         # check that the lists are not empty
         if not param_grid or any(not v for v in param_grid.values()):
-            raise ValueError("param_grid e le sue liste non possono essere vuote.")
+            raise ValueError("param_grid and its list must not be empty.")
 
     # if nested is True, start the loop for hyperparameter optimization
     if nested: 
@@ -45,15 +45,15 @@ def cross_validation_function(
         if inner_cv is None or outer_cv is None : 
 
             # use ValueError when a value is incompatible with the function requirements
-            raise ValueError("Specificare inner_cv e outer_cv per la nested cross validation")
+            raise ValueError("Specify inner_cv and outer_cv for nested cross validation")
             
         if not isinstance(inner_cv, valid_cv):
             
             # use TypeError when the object has the wrong type
-            raise TypeError(f"inner_cv deve essere uno tra {valid_cv}")
+            raise TypeError(f"inner_cv must be one of: {valid_cv}")
 
         if not isinstance(outer_cv, valid_cv):
-            raise TypeError("outer_cv non è di un tipo valido.")
+            raise TypeError("outer_cv is not a valid type.")
 
         # allow nested CV with different cross-validation methods for the outer loop
         if isinstance(outer_cv,(KFold,ShuffleSplit,LeaveOneOut)): 
@@ -140,7 +140,7 @@ def cross_validation_function(
         # check whether the method has been initialized
         if cv_method is None:
             raise ValueError(
-                "Specificare cv_method quando nested=False."
+                "Specify cv_method when nested=False."
             )
 
         # check whether the method object has been correctly initialized
@@ -149,7 +149,7 @@ def cross_validation_function(
         elif  isinstance(cv_method,StratifiedKFold) : 
             split_data = cv_method.split(X,y)
         else : 
-            raise TypeError("oggetto cv_method non inizializzato correttamente")
+            raise TypeError("object cv_method not correctly initialized")
 
         y_true = []
         y_pred = []
