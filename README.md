@@ -14,15 +14,16 @@ repository/
 ├── results/
 │   └── Output files containing the benchmark results
 │
-├── functions/
-│   ├── imports.py
-│   ├── metrics.py
-│   ├── my_cv_function.py
-│   └── Cross_validation_function.py
-│
-├── main.py
-│
-└── pre_post_processing.py
+└── src/
+    ├── functions/
+    │   ├── imports.py
+    │   ├── metrics.py
+    │   ├── my_cv_function.py
+    │   └── Cross_validation_function.py
+    │
+    ├── main.py
+    │
+    └── pre_post_processing.py
 ```
 
 ### Main Components
